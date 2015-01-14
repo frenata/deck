@@ -7,7 +7,8 @@ import (
 )
 
 type Card interface {
-	Show() string
+	Played(Player) Player
+	String() string
 }
 
 type Player interface {
@@ -20,9 +21,9 @@ func PrintCards(stack []Card) string {
 
 	for _, c := range stack {
 		if s != "" {
-			s = s + " " + c.Show()
+			s = s + " " + c.String()
 		} else {
-			s = c.Show()
+			s = c.String()
 		}
 
 	}
@@ -33,6 +34,7 @@ type Deck struct {
 	Cards    []Card
 	Shuffled []Card
 	Dealt    []Card
+	Players  []Player
 }
 
 func (d *Deck) String() string {
@@ -40,6 +42,7 @@ func (d *Deck) String() string {
 }
 
 func (d *Deck) Shuffle(seed int) {
+
 	rnd := NewSeed(seed)
 	n := make([]Card, len(d.Shuffled), len(d.Cards))
 	r := rnd.Perm(len(d.Shuffled))
@@ -51,9 +54,21 @@ func (d *Deck) Shuffle(seed int) {
 	d.Shuffled = n
 }
 
-func (d *Deck) DealAll(players []Player) (n int) {
+func (d *Deck) ReturnCards(cards []Card) {
+	for _, c := range cards {
+		c.Played(nil)
+		d.Shuffled = append(d.Shuffled, c)
+	}
+	/*for _, c := range cards {
+		if !PopSlice(c, cards) {
+			fmt.Println("error!")
+		}
+	}*/
+}
+
+func (d *Deck) DealAll() (n int) {
 	for len(d.Shuffled) > 0 {
-		for _, p := range players {
+		for _, p := range d.Players {
 			n++
 			p.AddCard(d.Shuffled[0])
 			d.Dealt = append(d.Dealt, d.Shuffled[0])
@@ -73,4 +88,14 @@ func NewSeed(seed int) *rand.Rand {
 	s := rand.NewSource(s64)
 	r := rand.New(s)
 	return r
+}
+
+func PopSlice(c Card, s []Card) bool {
+	for i, v := range s {
+		if c == v {
+			s = append(s[:i], s[i+1:]...)
+			return true
+		}
+	}
+	return false
 }

@@ -20,8 +20,8 @@ type Game struct {
 }
 
 type Board struct {
-	center *PlayedCard
-	flip   []*PlayedCard
+	center *NichtCard
+	flip   []*NichtCard
 }
 
 func NewNichtGame(players []*NichtPlayer, l *log.Logger) *Game {
@@ -39,14 +39,18 @@ func NewNichtGame(players []*NichtPlayer, l *log.Logger) *Game {
 	for _, p := range g.players {
 		gp = append(gp, p)
 	}
-	g.deck.DealAll(gp)
+	g.deck.Players = gp
+	g.deck.DealAll()
 	g.button <- g.players[0]
 	g.log.Printf("Cards dealt, %v has the button.\n", g.players[0].Name)
 	return g
 }
 
+// Prints the current gamestate
 func (g *Game) String() string {
-	s := "**Hands**\n"
+	s := "**Deck**\n"
+	s += fmt.Sprintln(g.deck)
+	s += "**Hands**\n"
 	for _, p := range g.players {
 		s += fmt.Sprintln(p.Name)
 		s += fmt.Sprintln(p.PrintHand())
@@ -72,7 +76,7 @@ func (g *Game) String() string {
 func (g *Game) preRandRound() {
 	b := <-g.button
 	g.board.center = b.PlayRand()
-	g.log.Printf("%v starts the round by putting %v in the middle.\n", b.Name, g.board.center.C.Show())
+	g.log.Printf("%v starts the round by putting %v in the middle.\n", b.Name, g.board.center)
 	for _, p := range g.players {
 		if p != b {
 			g.board.flip = append(g.board.flip, p.PlayRand())
@@ -83,7 +87,7 @@ func (g *Game) preRandRound() {
 
 func (g *Game) printFlip() (s string) {
 	for _, f := range g.board.flip {
-		s += fmt.Sprintf("%v: %v | ", f.P.String(), f.C.Show())
+		s += fmt.Sprintf("%v: %v | ", f.play, f)
 	}
 	return s
 }
@@ -99,13 +103,13 @@ func (g *Game) randRound() {
 func (g *Game) randTurn(p *NichtPlayer) {
 	if len(g.board.flip) > 0 {
 		r := rand.Intn(len(g.board.flip))
-		g.log.Printf("%v chooses %v\n", p.Name, g.board.flip[r].C.Show())
-		p.AddTable(g.board.flip[r].C.(*NichtCard))
-		g.turn <- g.board.flip[r].P.(*NichtPlayer)
+		g.log.Printf("%v chooses %v\n", p.Name, g.board.flip[r])
+		p.AddTable(g.board.flip[r])
+		g.turn <- g.board.flip[r].play
 		g.board.flip = append(g.board.flip[:r], g.board.flip[r+1:]...)
 	} else { // center is the only card left
-		p.AddTable(g.board.center.C.(*NichtCard))
-		g.log.Printf("%v takes %v from the middle.\n", p.Name, g.board.center.C.Show())
+		p.AddTable(g.board.center)
+		g.log.Printf("%v takes %v from the middle.\n", p.Name, g.board.center)
 		g.button <- p
 		g.board.center = nil
 		g.board.flip = nil
@@ -122,7 +126,7 @@ func (g *Game) Score() (score string) {
 }
 
 func PlayerScore(p *NichtPlayer) (score string, total int) {
-	var blueV, redV, yellowV, greenV int
+	var blueV, redV, yellowV, greenV int = 0, 0, 0, 0
 	var blueS, redS, yellowS, greenS int = 1, 1, 1, 1
 
 	for _, gc := range p.Table {
@@ -164,7 +168,17 @@ func PlayerScore(p *NichtPlayer) (score string, total int) {
 		"%v -- Blue: %v, Red: %v, Yellow: %v, Green: %v, Total: %v\n",
 		p.Name, blueV, redV, yellowV, greenV, total)
 
+	p.Score += total
 	return score, total
+}
+
+// TODO: issues with this code or something related, cards not returning properly.
+func (g *Game) Reshuffle() {
+	for _, p := range g.players {
+		g.deck.ReturnCards(p.Table)
+		p.Table = nil
+	}
+	g.deck.Shuffle(-1)
 }
 
 func main() {
@@ -178,8 +192,29 @@ func main() {
 		g.preRandRound()
 		g.randRound()
 	}
-
-	fmt.Println(g)
 	fmt.Println(g.Score())
+
+	g.log.Println("Round 2")
+	g.Reshuffle()
+	g.deck.DealAll()
+	for i := 0; i < 15; i++ {
+		g.preRandRound()
+		g.randRound()
+	}
+	fmt.Println(g.Score())
+
+	g.log.Println("Round 3")
+	g.Reshuffle()
+	g.deck.DealAll()
+	for i := 0; i < 15; i++ {
+		g.preRandRound()
+		g.randRound()
+	}
+	fmt.Println(g.Score())
+
+	for _, p := range g.players {
+		fmt.Printf("%v's final score: %v\n", p, p.Score)
+	}
+
 	ioutil.WriteFile("nicht.log", buf.Bytes(), 0660)
 }

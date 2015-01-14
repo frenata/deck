@@ -58,6 +58,7 @@ type NichtCard struct {
 	Color string
 	Cat   string
 	Value int
+	play  *NichtPlayer
 }
 
 func NewNichtCard(color, cat string, value int) *NichtCard {
@@ -69,7 +70,7 @@ func NewNichtCard(color, cat string, value int) *NichtCard {
 	return c
 }
 
-func (c *NichtCard) Show() string {
+func (c *NichtCard) String() string {
 	s := c.Color[:1]
 	v := fmt.Sprint(c.Value)
 	if c.Cat == special {
@@ -77,6 +78,15 @@ func (c *NichtCard) Show() string {
 	} else { //if cat == normal {
 		return s + v
 	}
+}
+
+func (c *NichtCard) Played(p gaga.Player) gaga.Player {
+	if p == nil {
+		c.play = nil
+	} else {
+		c.play = p.(*NichtPlayer)
+	}
+	return c.play
 }
 
 type PlayedCard struct {
@@ -92,6 +102,7 @@ type NichtPlayer struct {
 	Name  string
 	Hand  []gaga.Card
 	Table []gaga.Card
+	Score int
 }
 
 func NewNichtPlayer(name string) *NichtPlayer {
@@ -100,13 +111,14 @@ func NewNichtPlayer(name string) *NichtPlayer {
 	return p
 }
 
-func (p *NichtPlayer) PlayRand() *PlayedCard {
+func (p *NichtPlayer) PlayRand() *NichtCard {
 	//rnd := gaga.NewSeed()
 	n := rand.Intn(len(p.Hand))
-	c := p.Hand[n]
+	c := p.Hand[n].(*NichtCard)
 	p.Hand = append(p.Hand[:n], p.Hand[n+1:]...)
+	c.play = p
 
-	return &PlayedCard{c, p}
+	return c
 }
 
 func (p *NichtPlayer) AddTable(c *NichtCard) {
