@@ -25,24 +25,24 @@ var vSpecial = [5]int{-1, -1, -1, 0, 2}
 var vNormal = [10]int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
 
 type Card struct {
-	color string
-	cat   string
-	value int
+	Color string
+	Cat   string
+	Value int
 }
 
 func NewCard(color, cat string, value int) *Card {
 	c := new(Card)
-	c.color = color
-	c.cat = cat
-	c.value = value
+	c.Color = color
+	c.Cat = cat
+	c.Value = value
 
 	return c
 }
 
 func (c *Card) String() string {
-	s := c.color[:1]
-	v := fmt.Sprint(c.value)
-	if c.cat == special {
+	s := c.Color[:1]
+	v := fmt.Sprint(c.Value)
+	if c.Cat == special {
 		return s + "x" + v
 	} else { //if cat == normal {
 		return s + v
@@ -96,10 +96,10 @@ func (d *Deck) PrintDealt() string {
 	return PrintStack(d.dealt)
 }
 func (p *Player) PrintHand() string {
-	return PrintStack(p.hand)
+	return PrintStack(p.Hand)
 }
 func (p *Player) PrintTable() string {
-	return PrintStack(p.table)
+	return PrintStack(p.Table)
 }
 
 func (d *Deck) Shuffle() {
@@ -118,7 +118,7 @@ func (d *Deck) Deal(players []*Player) (n int) {
 	for len(d.shuffled) > 0 {
 		for _, p := range players {
 			n++
-			p.hand = append(p.hand, d.shuffled[0])
+			p.Hand = append(p.Hand, d.shuffled[0])
 			d.dealt = append(d.dealt, d.shuffled[0])
 			//fmt.Printf("Size is %v. Dealt %v to player %v\n", len(d.shuffled), d.shuffled[0], p.name)
 			d.shuffled = d.shuffled[1:]
@@ -136,8 +136,8 @@ func newSeed() *rand.Rand {
 
 type Player struct {
 	Name  string
-	hand  []*Card
-	table []*Card
+	Hand  []*Card
+	Table []*Card
 }
 
 func NewPlayer(name string) *Player {
@@ -148,15 +148,15 @@ func NewPlayer(name string) *Player {
 
 func (p *Player) PlayRand() *PlayedCard {
 	rnd := newSeed()
-	n := rnd.Intn(len(p.hand))
-	c := p.hand[n]
-	p.hand = append(p.hand[:n], p.hand[n+1:]...)
+	n := rnd.Intn(len(p.Hand))
+	c := p.Hand[n]
+	p.Hand = append(p.Hand[:n], p.Hand[n+1:]...)
 
 	return &PlayedCard{c, p}
 }
 
 func (p *Player) AddTable(c *Card) {
-	p.table = append(p.table, c)
+	p.Table = append(p.Table, c)
 }
 
 type PlayedCard struct {
