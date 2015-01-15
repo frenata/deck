@@ -80,22 +80,13 @@ func (c *NichtCard) String() string {
 	}
 }
 
-func (c *NichtCard) Played(p gaga.Player) gaga.Player {
+func (c *NichtCard) PlayedBy(p gaga.Player) gaga.Player {
 	if p == nil {
 		c.play = nil
 	} else {
 		c.play = p.(*NichtPlayer)
 	}
 	return c.play
-}
-
-type PlayedCard struct {
-	C gaga.Card
-	P gaga.Player
-}
-
-func (pc *PlayedCard) String() string {
-	return fmt.Sprintf("%v: %v", pc.P, pc.C)
 }
 
 type NichtPlayer struct {

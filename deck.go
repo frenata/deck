@@ -7,7 +7,7 @@ import (
 )
 
 type Card interface {
-	Played(Player) Player
+	PlayedBy(Player) Player
 	String() string
 }
 
@@ -56,7 +56,7 @@ func (d *Deck) Shuffle(seed int) {
 
 func (d *Deck) ReturnCards(cards []Card) {
 	for _, c := range cards {
-		c.Played(nil)
+		c.PlayedBy(nil)
 		d.Shuffled = append(d.Shuffled, c)
 	}
 	/*for _, c := range cards {
