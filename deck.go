@@ -36,6 +36,15 @@ type Deck struct {
 	Dealt    []Card
 }
 
+func NewDeck(cards []Card) *Deck {
+	d := new(Deck)
+	d.Cards = cards
+	d.Shuffled = make([]Card, len(d.Cards))
+	d.Dealt = make([]Card, 0, len(d.Cards))
+	copy(d.Shuffled, d.Cards)
+	return d
+}
+
 func (d *Deck) String() string {
 	return PrintCards(d.Shuffled)
 }
@@ -56,11 +65,6 @@ func (d *Deck) ReturnCards(cards []Card) {
 	for _, c := range cards {
 		d.Shuffled = append(d.Shuffled, c)
 	}
-	/*for _, c := range cards {
-		if !PopSlice(c, cards) {
-			fmt.Println("error!")
-		}
-	}*/
 }
 
 func (d *Deck) DealAll(players []Player) (n int) {

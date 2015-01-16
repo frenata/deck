@@ -39,19 +39,19 @@ var nichtPlayers = []*NichtPlayer{
 
 // could load from a config file
 func NewNichtDeck() *gaga.Deck {
-	d := new(gaga.Deck)
+	c := make([]gaga.Card, 60)
+	n := 0
 	for _, color := range colors {
 		for _, i := range vNormal {
-			d.Cards = append(d.Cards, NewNichtCard(color, normal, i))
+			c[n] = NewNichtCard(color, normal, i)
+			n++
 		}
 		for _, i := range vSpecial {
-			d.Cards = append(d.Cards, NewNichtCard(color, special, i))
+			c[n] = NewNichtCard(color, special, i)
+			n++
 		}
 	}
-	d.Shuffled = make([]gaga.Card, len(d.Cards))
-	d.Dealt = make([]gaga.Card, 0, len(d.Cards))
-	copy(d.Shuffled, d.Cards)
-	return d
+	return gaga.NewDeck(c)
 }
 
 type NichtCard struct {
