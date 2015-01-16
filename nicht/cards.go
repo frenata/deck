@@ -80,6 +80,16 @@ func (c *NichtCard) String() string {
 	}
 }
 
+// On further thought, this abstraction isn't producing any benefit.
+// NichtCard is merely fulfilling the interface mindlessly,
+// the actual game logic in game.go is interacting with the struct
+// directly.
+// Having the Card interface inherently related to a Player might
+// be worthwhile, but only if gaga.Deck also holds a []Player, so that
+// by itself gaga.Deck could handle removing Player pointers to cards
+// and reshuffling those cards into the deck. That seems a small benefit
+// for an unwieldy extra abstraction.
+/*
 func (c *NichtCard) PlayedBy(p gaga.Player) gaga.Player {
 	if p == nil {
 		c.play = nil
@@ -88,6 +98,7 @@ func (c *NichtCard) PlayedBy(p gaga.Player) gaga.Player {
 	}
 	return c.play
 }
+*/
 
 type NichtPlayer struct {
 	Name  string
@@ -103,7 +114,6 @@ func NewNichtPlayer(name string) *NichtPlayer {
 }
 
 func (p *NichtPlayer) PlayRand() *NichtCard {
-	//rnd := gaga.NewSeed()
 	n := rand.Intn(len(p.Hand))
 	c := p.Hand[n].(*NichtCard)
 	p.Hand = append(p.Hand[:n], p.Hand[n+1:]...)

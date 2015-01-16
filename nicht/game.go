@@ -33,16 +33,6 @@ func NewNichtGame(players []*NichtPlayer, l *log.Logger) *Game {
 	g.turn = make(chan *NichtPlayer, 1)
 	g.log = l
 
-	g.deck.Shuffle(1)
-	g.log.Println("deck shuffled")
-	var gp []gaga.Player
-	for _, p := range g.players {
-		gp = append(gp, p)
-	}
-	g.deck.Players = gp
-	g.deck.DealAll()
-	g.button <- g.players[0]
-	g.log.Printf("Cards dealt, %v has the button.\n", g.players[0].Name)
 	return g
 }
 
@@ -173,20 +163,29 @@ func PlayerScore(p *NichtPlayer) (score string, total int) {
 }
 
 // TODO: issues with this code or something related, cards not returning properly.
-func (g *Game) Reshuffle() {
+func (g *Game) Reshuffle(seed int) {
 	for _, p := range g.players {
 		g.deck.ReturnCards(p.Table)
 		p.Table = nil
 	}
-	g.deck.Shuffle(-1)
+	g.deck.Shuffle(seed)
 }
 
 func main() {
 	var buf bytes.Buffer
 	l := log.New(&buf, "Nicht: ", log.Ltime)
 	g := NewNichtGame(nichtPlayers, l)
+
 	g.log.Println("New Game!")
-	g.deck.Shuffle(1)
+	g.deck.Shuffle(-1)
+	g.log.Println("deck shuffled")
+	var gp []gaga.Player
+	for _, p := range g.players {
+		gp = append(gp, p)
+	}
+	g.deck.DealAll(gp)
+	g.button <- g.players[0]
+	g.log.Printf("Cards dealt, %v has the button.\n", g.players[0].Name)
 
 	for i := 0; i < 15; i++ {
 		g.preRandRound()
@@ -195,8 +194,8 @@ func main() {
 	fmt.Println(g.Score())
 
 	g.log.Println("Round 2")
-	g.Reshuffle()
-	g.deck.DealAll()
+	g.Reshuffle(-1)
+	g.deck.DealAll(gp)
 	for i := 0; i < 15; i++ {
 		g.preRandRound()
 		g.randRound()
@@ -204,8 +203,8 @@ func main() {
 	fmt.Println(g.Score())
 
 	g.log.Println("Round 3")
-	g.Reshuffle()
-	g.deck.DealAll()
+	g.Reshuffle(-1)
+	g.deck.DealAll(gp)
 	for i := 0; i < 15; i++ {
 		g.preRandRound()
 		g.randRound()
