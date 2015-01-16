@@ -7,7 +7,7 @@ import (
 )
 
 type Card interface {
-	PlayedBy(Player) Player
+	//PlayedBy(Player) Player
 	String() string
 }
 
@@ -34,7 +34,6 @@ type Deck struct {
 	Cards    []Card
 	Shuffled []Card
 	Dealt    []Card
-	Players  []Player
 }
 
 func (d *Deck) String() string {
@@ -42,8 +41,7 @@ func (d *Deck) String() string {
 }
 
 func (d *Deck) Shuffle(seed int) {
-
-	rnd := NewSeed(seed)
+	rnd := deckSeed(seed)
 	n := make([]Card, len(d.Shuffled), len(d.Cards))
 	r := rnd.Perm(len(d.Shuffled))
 	j := 0
@@ -56,7 +54,6 @@ func (d *Deck) Shuffle(seed int) {
 
 func (d *Deck) ReturnCards(cards []Card) {
 	for _, c := range cards {
-		c.PlayedBy(nil)
 		d.Shuffled = append(d.Shuffled, c)
 	}
 	/*for _, c := range cards {
@@ -66,20 +63,30 @@ func (d *Deck) ReturnCards(cards []Card) {
 	}*/
 }
 
-func (d *Deck) DealAll() (n int) {
-	for len(d.Shuffled) > 0 {
-		for _, p := range d.Players {
-			n++
-			p.AddCard(d.Shuffled[0])
-			d.Dealt = append(d.Dealt, d.Shuffled[0])
-			//fmt.Printf("Size is %v. Dealt %v to player %v\n", len(d.shuffled), d.shuffled[0], p.name)
-			d.Shuffled = d.Shuffled[1:]
+func (d *Deck) DealAll(players []Player) (n int) {
+	for {
+		for _, p := range players {
+			if d.Deal(p) {
+				n++
+			} else { // if Deal fails, no more shuffled
+				return n
+			}
 		}
 	}
-	return n
 }
 
-func NewSeed(seed int) *rand.Rand {
+func (d *Deck) Deal(p Player) bool {
+	if len(d.Shuffled) > 0 {
+		p.AddCard(d.Shuffled[0])
+		d.Dealt = append(d.Dealt, d.Shuffled[0])
+		d.Shuffled = d.Shuffled[1:]
+		return true
+	} else {
+		return false
+	}
+}
+
+func deckSeed(seed int) *rand.Rand {
 	s64 := int64(seed)
 
 	if s64 == -1 {
