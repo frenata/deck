@@ -2,6 +2,7 @@
 package gaga
 
 import (
+	"math"
 	"math/rand"
 	"time"
 )
@@ -101,7 +102,7 @@ func deckSeed(seed int) *rand.Rand {
 	return r
 }
 
-func PopSlice(c Card, s []Card) bool {
+func PopCard(c Card, s []Card) bool {
 	for i, v := range s {
 		if c == v {
 			s = append(s[:i], s[i+1:]...)
@@ -109,4 +110,37 @@ func PopSlice(c Card, s []Card) bool {
 		}
 	}
 	return false
+}
+
+func CardCombinations(cards []Card) [][]Card {
+	var results [][]Card
+	set := Combination(len(cards))
+
+	for _, s := range set {
+		row := []Card{}
+		for _, v := range s {
+			row = append(row, cards[v])
+		}
+		results = append(results, row)
+	}
+	return results
+}
+
+func Combination(n int) [][]int {
+	var slice []int
+	var results [][]int
+	var b byte
+	for i := 0; i < int(math.Pow(2, float64(n))); i++ {
+		b = byte(i)
+		slice = []int{}
+		for j := 0; j < n; j++ { //int(math.Pow(2, float64(n))); j++ {
+			if b>>uint(j)&1 == 1 {
+				slice = append(slice, j)
+			}
+		}
+		if len(slice) != 0 {
+			results = append(results, slice)
+		}
+	}
+	return results
 }
