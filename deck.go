@@ -1,5 +1,5 @@
-// Gaga defines some useful interfaces and functions for manipulating card decks in games.
-package gaga
+// Package deck defines some useful interfaces and functions for manipulating card decks in games.
+package deck
 
 import (
 	"math"

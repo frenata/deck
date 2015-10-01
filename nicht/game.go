@@ -7,7 +7,7 @@ import (
 	"log"
 	"math/rand"
 
-	"github.com/frenata/gaga"
+	"github.com/frenata/deck"
 )
 
 // A Game defines all the necessary structures to play a game of Nicht die Bonne.
@@ -15,7 +15,7 @@ type Game struct {
 	players []*NichtPlayer
 	turn    chan *NichtPlayer
 	button  chan *NichtPlayer
-	deck    *gaga.Deck
+	deck    *deck.Deck
 	board   *Board
 	log     *log.Logger
 }
@@ -198,7 +198,7 @@ func main() {
 	g.log.Println("New Game!")
 	g.deck.Shuffle(-1)
 	g.log.Println("deck shuffled")
-	var gp []gaga.Player
+	var gp []deck.Player
 	for _, p := range g.players {
 		gp = append(gp, p)
 	}

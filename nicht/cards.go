@@ -13,7 +13,7 @@ import (
 	"fmt"
 	"math/rand"
 
-	"github.com/frenata/gaga"
+	"github.com/frenata/deck"
 )
 
 // defining some string constants for use in defining the standard nicht deck.
@@ -43,8 +43,8 @@ var nichtPlayers = []*NichtPlayer{
 // NewNichtDeck creates and populates a standard Nicht Deck
 // TODO: Since this really only needs to be done once, move the logic to an init()
 // function and create a package variable that holds a standard Nicht Deck.
-func NewNichtDeck() *gaga.Deck {
-	c := make([]gaga.Card, 60)
+func NewNichtDeck() *deck.Deck {
+	c := make([]deck.Card, 60)
 	n := 0
 	for _, color := range colors {
 		for _, i := range vNormal {
@@ -56,7 +56,7 @@ func NewNichtDeck() *gaga.Deck {
 			n++
 		}
 	}
-	return gaga.NewDeck(c)
+	return deck.NewDeck(c)
 }
 
 // A NichtCard contains the vital information about a Nicht Card, color, value,
@@ -99,12 +99,12 @@ func (c *NichtCard) String() string {
 // the actual game logic in game.go is interacting with the struct
 // directly.
 // Having the Card interface inherently related to a Player might
-// be worthwhile, but only if gaga.Deck also holds a []Player, so that
-// by itself gaga.Deck could handle removing Player pointers to cards
+// be worthwhile, but only if deck.Deck also holds a []Player, so that
+// by itself deck.Deck could handle removing Player pointers to cards
 // and reshuffling those cards into the deck. That seems a small benefit
 // for an unwieldy extra abstraction.
 /*
-func (c *NichtCard) PlayedBy(p gaga.Player) gaga.Player {
+func (c *NichtCard) PlayedBy(p deck.Player) deck.Player {
 	if p == nil {
 		c.play = nil
 	} else {
@@ -117,8 +117,8 @@ func (c *NichtCard) PlayedBy(p gaga.Player) gaga.Player {
 // A NichtPlayer is a player of the Nicht game, has a name, a score, a hand of cards, and a table of cards.
 type NichtPlayer struct {
 	Name  string
-	Hand  []gaga.Card
-	Table []gaga.Card
+	Hand  []deck.Card
+	Table []deck.Card
 	Score int
 }
 
@@ -146,27 +146,27 @@ func (p *NichtPlayer) AddTable(c *NichtCard) {
 	p.Table = append(p.Table, c)
 }
 
-// AddCard adds a card to a player's hand. Implements gaga.Player
-func (p *NichtPlayer) AddCard(c gaga.Card) {
+// AddCard adds a card to a player's hand. Implements deck.Player
+func (p *NichtPlayer) AddCard(c deck.Card) {
 	p.Hand = append(p.Hand, c.(*NichtCard))
 }
 
 // PrintHand prints a player's current hand.
 func (p *NichtPlayer) PrintHand() string {
-	var gc []gaga.Card
+	var gc []deck.Card
 	for _, c := range p.Hand {
 		gc = append(gc, c)
 	}
-	return gaga.PrintCards(gc)
+	return deck.PrintCards(gc)
 }
 
 // PrintTable prints a player's current table.
 func (p *NichtPlayer) PrintTable() string {
-	var gc []gaga.Card
+	var gc []deck.Card
 	for _, c := range p.Table {
 		gc = append(gc, c)
 	}
-	return gaga.PrintCards(gc)
+	return deck.PrintCards(gc)
 }
 
 // String prints a player's name. Should this also print Hand and Table?
