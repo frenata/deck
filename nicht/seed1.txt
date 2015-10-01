@@ -1,0 +1,22 @@
+**Scores**
+P1 -- Blue: 7, Red: 14, Yellow: -18, Green: 19, Total: 22
+P2 -- Blue: -64, Red: 2, Yellow: -10, Green: -16, Total: -88
+P3 -- Blue: 0, Red: 0, Yellow: 0, Green: 0, Total: 0
+P4 -- Blue: 10, Red: -26, Yellow: -18, Green: -15, Total: -49
+
+**Scores**
+P1 -- Blue: 32, Red: -30, Yellow: 16, Green: 0, Total: 18
+P2 -- Blue: 0, Red: 0, Yellow: -15, Green: -32, Total: -47
+P3 -- Blue: -10, Red: 12, Yellow: 0, Green: 0, Total: 2
+P4 -- Blue: -21, Red: -6, Yellow: -23, Green: 7, Total: -43
+
+**Scores**
+P1 -- Blue: -17, Red: -6, Yellow: -13, Green: 0, Total: -36
+P2 -- Blue: 0, Red: 0, Yellow: 14, Green: 26, Total: 40
+P3 -- Blue: 0, Red: 15, Yellow: 0, Green: -34, Total: -19
+P4 -- Blue: -22, Red: 31, Yellow: 11, Green: 8, Total: 28
+
+P1's final score: 4
+P2's final score: -95
+P3's final score: -17
+P4's final score: -64

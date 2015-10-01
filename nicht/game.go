@@ -196,7 +196,7 @@ func main() {
 	g := NewNichtGame(nichtPlayers, l)
 
 	g.log.Println("New Game!")
-	g.deck.Shuffle(-1)
+	g.deck.Shuffle(1)
 	g.log.Println("deck shuffled")
 	var gp []deck.Player
 	for _, p := range g.players {
@@ -213,7 +213,7 @@ func main() {
 	fmt.Println(g.Score())
 
 	g.log.Println("Round 2")
-	g.Reshuffle(-1)
+	g.Reshuffle(1)
 	g.deck.DealAll(gp)
 	for i := 0; i < 15; i++ {
 		g.preRandRound()
@@ -222,7 +222,7 @@ func main() {
 	fmt.Println(g.Score())
 
 	g.log.Println("Round 3")
-	g.Reshuffle(-1)
+	g.Reshuffle(1)
 	g.deck.DealAll(gp)
 	for i := 0; i < 15; i++ {
 		g.preRandRound()

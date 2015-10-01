@@ -44,44 +44,41 @@ func PrintCards(stack []Card) string {
 }
 
 // Deck collects Cards into a usable collection, suitable for shuffling and dealing.
-// Three arrays are available:
-// 	Cards - all the cards assigned to the deck, regardless of whether they have
-//		been shuffled or dealt.
-//	Shuffled - all the cards that have been shuffled but not yet dealt to Players.
-//	Dealt - all the cards that have been dealt to Players.
-// TODO: Should these arrays be accessible via getter functions only? So users cannot
-// disrupt the data structure by removing a Card from the Cards array but not another.
-// TODO: Cards should either be removed or renamed to something more suitable to
-// represent that it represents all Cards attached to the Deck regardless of state,
-// and should not be used directly.
-//	All []Card
-// Likewise, Shuffled is currently
-// confusing and does not accurately represent what it is, which is the working set of
-// cards in the deck, ready to be dealt, whether shuffled or not.
-// 	Cards []Card
-// Add another slice:
-//	Discard
+//	cards - all the cards that have been shuffled but not yet dealt to Players.
+//	discards - all the cards that have been returned to the deck
 type Deck struct {
-	Cards    []Card
-	Shuffled []Card
-	Dealt    []Card
+	cards    []Card //cards currently in the deck
+	discards []Card //cards currently in the deck
 }
 
-// NewDeck accepts a slice of Cards and creates a new Deck ready for use.
+// New accepts a slice of Cards and creates a new Deck ready for use.
 // Cards and Shuffled are both populated with equivalent slices.
 // Shuffle must be called explicitly after a NewDeck is returned to shuffle the cards.
-func NewDeck(cards []Card) *Deck {
+func New(cards []Card) *Deck {
 	d := new(Deck)
-	d.Cards = cards
-	d.Shuffled = make([]Card, len(d.Cards))
-	d.Dealt = make([]Card, 0, len(d.Cards))
-	copy(d.Shuffled, d.Cards)
+	d.cards = make([]Card, len(cards))
+	copy(d.cards, cards)
+	d.discards = make([]Card, 0, len(d.cards))
 	return d
+}
+
+// Cards returns a list of the cards in the deck.
+func (d *Deck) Cards() []Card {
+	cards := make([]Card, len(d.cards))
+	copy(cards, d.cards)
+	return cards
+}
+
+// Discards returns a list of the cards in the deck.
+func (d *Deck) Discards() []Card {
+	discards := make([]Card, len(d.discards))
+	copy(discards, d.discards)
+	return discards
 }
 
 // String prints all the *shuffled* cards in the deck.
 func (d *Deck) String() string {
-	return PrintCards(d.Shuffled)
+	return PrintCards(d.cards)
 }
 
 // Shuffle takes a seed and randomizes the cards contained in the Shuffled slice.
@@ -89,14 +86,21 @@ func (d *Deck) String() string {
 // via a seperate method.
 func (d *Deck) Shuffle(seed int) {
 	rnd := deckSeed(seed)
-	n := make([]Card, len(d.Shuffled), len(d.Cards))
-	r := rnd.Perm(len(d.Shuffled))
+
+	var toshuffle []Card
+	toshuffle = append(toshuffle, d.cards...)
+	toshuffle = append(toshuffle, d.discards...)
+
+	d.discards = make([]Card, 0, len(toshuffle))
+
+	shuffled := make([]Card, len(toshuffle))
+	r := rnd.Perm(len(toshuffle))
 	j := 0
 	for _, i := range r {
-		n[j] = d.Shuffled[i]
+		shuffled[j] = toshuffle[i]
 		j++
 	}
-	d.Shuffled = n
+	d.cards = shuffled
 }
 
 // ReturnCards takes a slice of cards (from a Player?) and adds them back into Shuffled.
@@ -104,9 +108,9 @@ func (d *Deck) Shuffle(seed int) {
 // Likewise, since the implication is that these cards were previously dealt by
 // this deck, there should be error checking to verify: if a card was not previously
 // dealt, an error should be returned. And if it was, remove it from Dealt slice.
-func (d *Deck) ReturnCards(cards []Card) {
+func (d *Deck) Discard(cards []Card) {
 	for _, c := range cards {
-		d.Shuffled = append(d.Shuffled, c)
+		d.discards = append(d.discards, c)
 	}
 }
 
@@ -129,10 +133,9 @@ func (d *Deck) DealAll(players []Player) (n int) {
 // Deal adds a card from the shuffled cards to a Player.
 // Returns true if a card was dealt, false if not. (no cards left)
 func (d *Deck) Deal(p Player) bool {
-	if len(d.Shuffled) > 0 {
-		p.AddCard(d.Shuffled[0])
-		d.Dealt = append(d.Dealt, d.Shuffled[0])
-		d.Shuffled = d.Shuffled[1:]
+	if len(d.cards) > 0 {
+		p.AddCard(d.cards[0])
+		d.cards = d.cards[1:]
 		return true
 	} else {
 		return false
