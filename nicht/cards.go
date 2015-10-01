@@ -16,6 +16,7 @@ import (
 	"github.com/frenata/gaga"
 )
 
+// defining some string constants for use in defining the standard nicht deck.
 const (
 	blue   = "Blue"
 	green  = "Green"
@@ -26,10 +27,12 @@ const (
 	normal  = "normal"
 )
 
+// the types of card *details* contained in the nicht deck: color, special numbers, regular numbers.
 var colors = [4]string{blue, green, yellow, red}
 var vSpecial = [5]int{-1, -1, -1, 0, 2}
 var vNormal = [10]int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
 
+// some barely named AI players. This might make more sense in game.go
 var nichtPlayers = []*NichtPlayer{
 	NewNichtPlayer("P1"),
 	NewNichtPlayer("P2"),
@@ -37,7 +40,9 @@ var nichtPlayers = []*NichtPlayer{
 	NewNichtPlayer("P4"),
 }
 
-// could load from a config file
+// NewNichtDeck creates and populates a standard Nicht Deck
+// TODO: Since this really only needs to be done once, move the logic to an init()
+// function and create a package variable that holds a standard Nicht Deck.
 func NewNichtDeck() *gaga.Deck {
 	c := make([]gaga.Card, 60)
 	n := 0
@@ -54,6 +59,8 @@ func NewNichtDeck() *gaga.Deck {
 	return gaga.NewDeck(c)
 }
 
+// A NichtCard contains the vital information about a Nicht Card, color, value,
+// whether it is special or normal, and who played it.
 type NichtCard struct {
 	Color string
 	Cat   string
@@ -61,6 +68,9 @@ type NichtCard struct {
 	play  *NichtPlayer
 }
 
+// NewNichtCard creates a new card.
+// TODO: Actually, this seems like it can be easily removed in favor of a struct literal in NewNichtDeck?
+// TODO: Not needed by the user, does not need to be exported.
 func NewNichtCard(color, cat string, value int) *NichtCard {
 	c := new(NichtCard)
 	c.Color = color
@@ -70,6 +80,10 @@ func NewNichtCard(color, cat string, value int) *NichtCard {
 	return c
 }
 
+// String prints a NichtCard representation:
+// 	first letter of the color
+// 	'x' if the card is special
+//	the integer value of the card
 func (c *NichtCard) String() string {
 	s := c.Color[:1]
 	v := fmt.Sprint(c.Value)
@@ -100,6 +114,7 @@ func (c *NichtCard) PlayedBy(p gaga.Player) gaga.Player {
 }
 */
 
+// A NichtPlayer is a player of the Nicht game, has a name, a score, a hand of cards, and a table of cards.
 type NichtPlayer struct {
 	Name  string
 	Hand  []gaga.Card
@@ -107,12 +122,16 @@ type NichtPlayer struct {
 	Score int
 }
 
+// NewNichtPlayer creates a new player with their name.
 func NewNichtPlayer(name string) *NichtPlayer {
 	p := new(NichtPlayer)
 	p.Name = name
 	return p
 }
 
+// Initial mock of AI play to make the game logic work, this simply randomly chooses an available card
+// to play from hand.
+// TODO: Obviously there should be a more intelligent function at some point.
 func (p *NichtPlayer) PlayRand() *NichtCard {
 	n := rand.Intn(len(p.Hand))
 	c := p.Hand[n].(*NichtCard)
@@ -122,14 +141,17 @@ func (p *NichtPlayer) PlayRand() *NichtCard {
 	return c
 }
 
+// AddTable adds a card to a player's table.
 func (p *NichtPlayer) AddTable(c *NichtCard) {
 	p.Table = append(p.Table, c)
 }
 
+// AddCard adds a card to a player's hand. Implements gaga.Player
 func (p *NichtPlayer) AddCard(c gaga.Card) {
 	p.Hand = append(p.Hand, c.(*NichtCard))
 }
 
+// PrintHand prints a player's current hand.
 func (p *NichtPlayer) PrintHand() string {
 	var gc []gaga.Card
 	for _, c := range p.Hand {
@@ -137,6 +159,8 @@ func (p *NichtPlayer) PrintHand() string {
 	}
 	return gaga.PrintCards(gc)
 }
+
+// PrintTable prints a player's current table.
 func (p *NichtPlayer) PrintTable() string {
 	var gc []gaga.Card
 	for _, c := range p.Table {
@@ -145,6 +169,7 @@ func (p *NichtPlayer) PrintTable() string {
 	return gaga.PrintCards(gc)
 }
 
+// String prints a player's name. Should this also print Hand and Table?
 func (p *NichtPlayer) String() string {
 	return p.Name
 }

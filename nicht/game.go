@@ -10,6 +10,7 @@ import (
 	"github.com/frenata/gaga"
 )
 
+// A Game defines all the necessary structures to play a game of Nicht die Bonne.
 type Game struct {
 	players []*NichtPlayer
 	turn    chan *NichtPlayer
@@ -19,24 +20,27 @@ type Game struct {
 	log     *log.Logger
 }
 
+// A Board tracks all the cards that are played in the center of the table.
+// TODO: Rename to Table?
 type Board struct {
 	center *NichtCard
 	flip   []*NichtCard
 }
 
+// NewNichtGame creates a new game, ready to be played, given a list of players and a logger.
 func NewNichtGame(players []*NichtPlayer, l *log.Logger) *Game {
 	g := new(Game)
-	g.players = players
-	g.deck = NewNichtDeck()
-	g.board = &Board{}
-	g.button = make(chan *NichtPlayer, 1)
-	g.turn = make(chan *NichtPlayer, 1)
-	g.log = l
+	g.players = players                   // setup players
+	g.deck = NewNichtDeck()               // TODO this should be a fixed variable
+	g.board = &Board{}                    // empty board
+	g.button = make(chan *NichtPlayer, 1) // channel for the holder of the button
+	g.turn = make(chan *NichtPlayer, 1)   // channel for current player
+	g.log = l                             // setup the logger
 
 	return g
 }
 
-// Prints the current gamestate
+// String prints the current gamestate, what's in the deck, the hands, the tables, and the board.
 func (g *Game) String() string {
 	s := "**Deck**\n"
 	s += fmt.Sprintln(g.deck)
@@ -63,6 +67,9 @@ func (g *Game) String() string {
 	return s
 }
 
+// AI random auto-play
+// the player with the button chooses a random card to put in the center, and the others select
+// random cards to flip, then the turn passes to the button player.
 func (g *Game) preRandRound() {
 	b := <-g.button
 	g.board.center = b.PlayRand()
@@ -75,6 +82,7 @@ func (g *Game) preRandRound() {
 	g.turn <- b
 }
 
+// print the cards that have been flipped
 func (g *Game) printFlip() (s string) {
 	for _, f := range g.board.flip {
 		s += fmt.Sprintf("%v: %v | ", f.play, f)
@@ -82,6 +90,9 @@ func (g *Game) printFlip() (s string) {
 	return s
 }
 
+// AI random play
+// each player in turn chooses a random card
+// TODO: this should cycle through the number of players rather than being fixed to four
 func (g *Game) randRound() {
 	g.log.Printf("Cards available: %v\n", g.printFlip())
 	g.randTurn(<-g.turn)
@@ -90,6 +101,8 @@ func (g *Game) randRound() {
 	g.randTurn(<-g.turn)
 }
 
+// AI random play
+// the given player chooses a random card from those available
 func (g *Game) randTurn(p *NichtPlayer) {
 	if len(g.board.flip) > 0 {
 		r := rand.Intn(len(g.board.flip))
@@ -106,6 +119,7 @@ func (g *Game) randTurn(p *NichtPlayer) {
 	}
 }
 
+// Score prints the scores for each player.
 func (g *Game) Score() (score string) {
 	score = "**Scores**\n"
 	for _, p := range g.players {
@@ -115,6 +129,9 @@ func (g *Game) Score() (score string) {
 	return score
 }
 
+// PlayerScore calculates the given players score.
+// score returns a string with the color breakdown of the score,
+// total returns the total numerical score.
 func PlayerScore(p *NichtPlayer) (score string, total int) {
 	var blueV, redV, yellowV, greenV int = 0, 0, 0, 0
 	var blueS, redS, yellowS, greenS int = 1, 1, 1, 1
@@ -163,6 +180,7 @@ func PlayerScore(p *NichtPlayer) (score string, total int) {
 }
 
 // TODO: issues with this code or something related, cards not returning properly.
+// TODO: Unsure if above is current. Suspect not.
 func (g *Game) Reshuffle(seed int) {
 	for _, p := range g.players {
 		g.deck.ReturnCards(p.Table)
@@ -171,6 +189,7 @@ func (g *Game) Reshuffle(seed int) {
 	g.deck.Shuffle(seed)
 }
 
+// play a random AI game, log it.
 func main() {
 	var buf bytes.Buffer
 	l := log.New(&buf, "Nicht: ", log.Ltime)
