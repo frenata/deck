@@ -6,43 +6,6 @@ import (
 	"time"
 )
 
-/* Card interface defines a object that represents a card in a card game
-   The implementing struct should be able to represent the Card via the String()
-   function.
-   Cards can be collected and shuffled in a Deck and be held by Players.
-
-   TODO: Should implementations store information about what Player has played a Card?
-*/
-type Card interface {
-	//PlayedBy(Player) Player
-	String() string
-}
-
-// Player defines an object that can be given Cards, and can print the cards it holds
-// as a String.
-// TODO: String() should be removed or renamed to Hand() string or Cards() string,
-// the same implementations kept, to better represent how it is being implemented.
-type Player interface {
-	AddCard(c Card)
-	String() string
-}
-
-// PrintCards takes a slice of Cards and returns a single string with each Card printed
-// and seperated by spaces.
-// For use as a helper function for structs that implement Card,
-func PrintCards(stack []Card) string {
-	var s string
-
-	for _, c := range stack {
-		if s != "" {
-			s = s + " " + c.String()
-		} else {
-			s = c.String()
-		}
-	}
-	return s
-}
-
 // Deck collects Cards into a usable collection, suitable for shuffling and dealing.
 //	cards - all the cards that have been shuffled but not yet dealt to Players.
 //	discards - all the cards that have been returned to the deck
@@ -154,16 +117,4 @@ func deckSeed(seed int) *rand.Rand {
 	s := rand.NewSource(s64)
 	r := rand.New(s)
 	return r
-}
-
-// PopCard attempts to remove a Card from a slice of Cards, returns true if successful.
-// **Not currently being used**
-func popCard(c Card, s []Card) bool {
-	for i, v := range s {
-		if c == v {
-			s = append(s[:i], s[i+1:]...)
-			return true
-		}
-	}
-	return false
 }
