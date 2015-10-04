@@ -56,7 +56,7 @@ func NewNichtDeck() *deck.Deck {
 			n++
 		}
 	}
-	return deck.NewDeck(c)
+	return deck.New(c)
 }
 
 // A NichtCard contains the vital information about a Nicht Card, color, value,

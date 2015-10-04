@@ -183,7 +183,7 @@ func PlayerScore(p *NichtPlayer) (score string, total int) {
 // TODO: Unsure if above is current. Suspect not.
 func (g *Game) Reshuffle(seed int) {
 	for _, p := range g.players {
-		g.deck.ReturnCards(p.Table)
+		g.deck.Discard(p.Table)
 		p.Table = nil
 	}
 	g.deck.Shuffle(seed)
@@ -235,4 +235,5 @@ func main() {
 	}
 
 	ioutil.WriteFile("nicht.log", buf.Bytes(), 0660)
+
 }
