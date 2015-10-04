@@ -6,11 +6,11 @@ import (
 	"strconv"
 )
 
-type suit string
-type rank int
+type Suit string
+type Rank int
 
-const ( // suits
-	Hearts   suit = "Hearts"
+const ( // Suits
+	Hearts   Suit = "Hearts"
 	Diamonds      = "Diamonds"
 	Spades        = "Spades"
 	Clubs         = "Clubs"
@@ -18,7 +18,7 @@ const ( // suits
 
 const (
 	_        = iota
-	Ace rank = iota
+	Ace Rank = iota
 	Two
 	Three
 	Four
@@ -35,20 +35,24 @@ const (
 
 // a card for a standard 52-card deck
 type Card struct {
-	suit
-	rank
+	suit  Suit
+	rank  Rank
 	name  string
 	short string
 }
 
 // create a new card, since this is the standard deck, this has no need to be exported
 // standard deck will be created in init()
-func newCard(r rank, s suit) Card {
+func newCard(r Rank, s Suit) Card {
 	c := Card{suit: s, rank: r}
 	c.name = fmt.Sprintf("%s of %s", longRank(r), s)
 	c.short = fmt.Sprintf("%s%s", shortRank(r), string(s[0]))
 
 	return c
+}
+
+func (c Card) Suit() Suit {
+	return c.suit
 }
 
 // String returns the short name of a card. Ex: "KC" for "King of Clubs"
@@ -61,8 +65,8 @@ func (c Card) Name() string {
 	return c.name
 }
 
-// convert rank to short value
-func shortRank(r rank) string {
+// convert Rank to short value
+func shortRank(r Rank) string {
 	switch r {
 	case Jack:
 		return "J"
@@ -77,8 +81,8 @@ func shortRank(r rank) string {
 	}
 }
 
-// convert rank to full string for Name()
-func longRank(r rank) string {
+// convert Rank to full string for Name()
+func longRank(r Rank) string {
 	switch r {
 	case Ace:
 		return "Ace"
