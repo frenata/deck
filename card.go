@@ -27,26 +27,3 @@ func PrintCards(stack []Card) string {
 	}
 	return s
 }
-
-// CardSlice takes a varidric list of Cards and returns a slice of Cards.
-// Useful for taking a slice of CardType and returning a slice of Card.
-func CardSlice(cards ...Card) []Card {
-	slice := make([]Card, len(cards))
-
-	for i, c := range cards {
-		slice[i] = c
-	}
-	return slice
-}
-
-// PopCard attempts to remove a Card from a slice of Cards, returns true if successful.
-// **Not currently being used**
-func popCard(c Card, s []Card) bool {
-	for i, v := range s {
-		if c == v {
-			s = append(s[:i], s[i+1:]...)
-			return true
-		}
-	}
-	return false
-}
