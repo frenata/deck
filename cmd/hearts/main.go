@@ -14,7 +14,7 @@ func main() {
 
 	d := deck52.New()
 
-	d.Shuffle(1)
+	d.Shuffle()
 
 	players := []deck.Player{NewPlayer("Andrew"), NewPlayer("Bekah"), NewPlayer("Chuck"), NewPlayer("Dave")}
 

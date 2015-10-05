@@ -12,6 +12,7 @@ import (
 type Deck struct {
 	cards    []Card //cards currently in the deck
 	discards []Card //cards currently in the deck
+	rng      *rand.Rand
 }
 
 // New accepts a slice of Cards and creates a new Deck ready for use.
@@ -22,6 +23,8 @@ func New(cards []Card) *Deck {
 	d.cards = make([]Card, len(cards))
 	copy(d.cards, cards)
 	d.discards = make([]Card, 0, len(d.cards))
+
+	d.Seed(1)
 	return d
 }
 
@@ -44,12 +47,8 @@ func (d *Deck) String() string {
 	return PrintCards(d.cards)
 }
 
-// Shuffle takes a seed and randomizes the cards contained in the Shuffled slice.
-// TODO: refactor to remove seed argument. Allow user to set the seed once and directly,
-// via a seperate method.
-func (d *Deck) Shuffle(seed int) {
-	rnd := deckSeed(seed)
-
+// Shuffle  shuffles the cards in the deck, based on the current seed.
+func (d *Deck) Shuffle() {
 	var toshuffle []Card
 	toshuffle = append(toshuffle, d.cards...)
 	toshuffle = append(toshuffle, d.discards...)
@@ -57,7 +56,7 @@ func (d *Deck) Shuffle(seed int) {
 	d.discards = make([]Card, 0, len(toshuffle))
 
 	shuffled := make([]Card, len(toshuffle))
-	r := rnd.Perm(len(toshuffle))
+	r := d.rng.Perm(len(toshuffle))
 	j := 0
 	for _, i := range r {
 		shuffled[j] = toshuffle[i]
@@ -107,14 +106,12 @@ func (d *Deck) Deal(p Player) bool {
 
 // Seed sets a random seed for Deck shuffling and dealing. Passing -1 uses the current
 // time, anything else is static and suitable for testing, etc.
-// TODO: Rewrite to provide user access and permanent struct seed.
-func deckSeed(seed int) *rand.Rand {
+func (d *Deck) Seed(seed int) {
 	s64 := int64(seed)
 
 	if s64 == -1 {
 		s64 = time.Now().UnixNano()
 	}
 	s := rand.NewSource(s64)
-	r := rand.New(s)
-	return r
+	d.rng = rand.New(s)
 }
