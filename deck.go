@@ -70,7 +70,7 @@ func (d *Deck) Shuffle() {
 // Likewise, since the implication is that these cards were previously dealt by
 // this deck, there should be error checking to verify: if a card was not previously
 // dealt, an error should be returned. And if it was, remove it from Dealt slice.
-func (d *Deck) Discard(cards []Card) {
+func (d *Deck) Discard(cards ...Card) {
 	for _, c := range cards {
 		d.discards = append(d.discards, c)
 	}

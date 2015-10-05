@@ -183,7 +183,7 @@ func PlayerScore(p *NichtPlayer) (score string, total int) {
 // TODO: Unsure if above is current. Suspect not.
 func (g *Game) Reshuffle() {
 	for _, p := range g.players {
-		g.deck.Discard(p.Table)
+		g.deck.Discard(p.Table...)
 		p.Table = nil
 	}
 	g.deck.Shuffle()
