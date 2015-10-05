@@ -27,3 +27,16 @@ func PrintCards(stack []Card) string {
 	}
 	return s
 }
+
+func PPrintCards(stack ...Card) string {
+	var s string
+
+	for _, c := range stack {
+		if s != "" {
+			s = s + " " + c.String()
+		} else {
+			s = c.String()
+		}
+	}
+	return s
+}

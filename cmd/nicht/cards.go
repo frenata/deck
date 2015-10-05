@@ -157,7 +157,8 @@ func (p *NichtPlayer) PrintHand() string {
 	for _, c := range p.Hand {
 		gc = append(gc, c)
 	}
-	return deck.PrintCards(gc)
+	//return deck.PPrintCards(gc...)
+	return deck.PPrintCards(p.Hand...)
 }
 
 // PrintTable prints a player's current table.
@@ -166,7 +167,7 @@ func (p *NichtPlayer) PrintTable() string {
 	for _, c := range p.Table {
 		gc = append(gc, c)
 	}
-	return deck.PrintCards(gc)
+	return deck.PPrintCards(gc...)
 }
 
 // String prints a player's name. Should this also print Hand and Table?
